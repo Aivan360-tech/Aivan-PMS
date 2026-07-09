@@ -1,0 +1,134 @@
+[
+  {
+    "id": "PMS-B1-A01",
+    "basement": "B1",
+    "cameraNumber": "CAM-101",
+    "puzzleNumber": "PZ-01",
+    "slotNumber": "A-101",
+    "vehicleSlotType": "Sedan",
+    "parkingType": "Employee",
+    "height": "1.8 m",
+    "allocation": "Allocated"
+  },
+  {
+    "id": "PMS-B1-A02",
+    "basement": "B1",
+    "cameraNumber": "CAM-102",
+    "puzzleNumber": "PZ-01",
+    "slotNumber": "A-102",
+    "vehicleSlotType": "CSUV",
+    "parkingType": "Employee",
+    "height": "2.0 m",
+    "allocation": "Available"
+  },
+  {
+    "id": "PMS-B1-A03",
+    "basement": "B1",
+    "cameraNumber": "CAM-103",
+    "puzzleNumber": "PZ-02",
+    "slotNumber": "A-103",
+    "vehicleSlotType": "Sedan",
+    "parkingType": "Visitor",
+    "height": "1.8 m",
+    "allocation": "Reserved"
+  },
+  {
+    "id": "PMS-B1-A04",
+    "basement": "B1",
+    "cameraNumber": "CAM-104",
+    "puzzleNumber": "PZ-02",
+    "slotNumber": "A-104",
+    "vehicleSlotType": "CSUV",
+    "parkingType": "Visitor",
+    "height": "2.1 m",
+    "allocation": "Allocated"
+  },
+  {
+    "id": "PMS-B2-B01",
+    "basement": "B2",
+    "cameraNumber": "CAM-201",
+    "puzzleNumber": "PZ-03",
+    "slotNumber": "B-201",
+    "vehicleSlotType": "Sedan",
+    "parkingType": "Employee",
+    "height": "1.8 m",
+    "allocation": "Maintenance"
+  },
+  {
+    "id": "PMS-B2-B02",
+    "basement": "B2",
+    "cameraNumber": "CAM-202",
+    "puzzleNumber": "PZ-03",
+    "slotNumber": "B-202",
+    "vehicleSlotType": "CSUV",
+    "parkingType": "Employee",
+    "height": "2.0 m",
+    "allocation": "Allocated"
+  },
+  {
+    "id": "PMS-B2-B03",
+    "basement": "B2",
+    "cameraNumber": "CAM-203",
+    "puzzleNumber": "PZ-04",
+    "slotNumber": "B-203",
+    "vehicleSlotType": "Sedan",
+    "parkingType": "Visitor",
+    "height": "1.9 m",
+    "allocation": "Available"
+  },
+  {
+    "id": "PMS-B2-B04",
+    "basement": "B2",
+    "cameraNumber": "CAM-204",
+    "puzzleNumber": "PZ-04",
+    "slotNumber": "B-204",
+    "vehicleSlotType": "CSUV",
+    "parkingType": "Visitor",
+    "height": "2.2 m",
+    "allocation": "Allocated"
+  },
+  {
+    "id": "PMS-B3-C01",
+    "basement": "B3",
+    "cameraNumber": "CAM-301",
+    "puzzleNumber": "PZ-05",
+    "slotNumber": "C-301",
+    "vehicleSlotType": "Sedan",
+    "parkingType": "Employee",
+    "height": "1.8 m",
+    "allocation": "Reserved"
+  },
+  {
+    "id": "PMS-B3-C02",
+    "basement": "B3",
+    "cameraNumber": "CAM-302",
+    "puzzleNumber": "PZ-05",
+    "slotNumber": "C-302",
+    "vehicleSlotType": "CSUV",
+    "parkingType": "Visitor",
+    "height": "2.1 m",
+    "allocation": "Available"
+  },
+  {
+    "id": "PMS-B3-C03",
+    "basement": "B3",
+    "cameraNumber": "CAM-303",
+    "puzzleNumber": "PZ-06",
+    "slotNumber": "C-303",
+    "vehicleSlotType": "Sedan",
+    "parkingType": "Employee",
+    "height": "1.8 m",
+    "allocation": "Allocated"
+  },
+  {
+    "id": "PMS-B3-C04",
+    "basement": "B3",
+    "cameraNumber": "CAM-304",
+    "puzzleNumber": "PZ-06",
+    "slotNumber": "C-304",
+    "vehicleSlotType": "CSUV",
+    "parkingType": "Visitor",
+    "height": "2.2 m",
+    "allocation": "Maintenance"
+  }
+]
