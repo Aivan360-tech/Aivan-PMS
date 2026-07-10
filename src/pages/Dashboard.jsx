@@ -56,6 +56,9 @@ const heatmapTimes = Array.from({ length: 24 }, (_, hour) => {
   return `${hour - 12} PM`;
 });
 
+// ADD THIS LINE RIGHT HERE:
+const heatmapDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 const recentActivity = [
   { time: '09:15 AM', vehicle: 'KA01AB1234', action: 'Vehicle Entry', zone: 'Ground', icon: FaSignInAlt },
   { time: '09:40 AM', vehicle: 'KA02CD5678', action: 'Vehicle Exit', zone: 'Puzzle', icon: FaSignOutAlt },
