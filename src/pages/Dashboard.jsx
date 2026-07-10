@@ -21,7 +21,6 @@ import {
   useParkingStore,
 } from '../utils/parkingStorage.js';
 
-
 import ParkingSlotCard from '../components/parking/ParkingSlotCard.jsx';
 import MetricCard from '../components/ui/MetricCard.jsx';
 import PageHeader from '../components/ui/PageHeader.jsx';
@@ -72,7 +71,7 @@ function getHeatmapTone(value) {
   return 'bg-slate-200 text-slate-600';
 }
 
-function getZoneSlots(zone,slots) {
+function getZoneSlots(zone, slots) {
   const basementMap = {
     Ground: 'B1',
     Puzzle: 'B2',
@@ -142,7 +141,7 @@ export default function Dashboard() {
 
   const featuredSlots = parkingData.slice(0, 6);
   const availableSlots = parkingData.filter((slot) => slot.allocation === 'Available');
-  const selectedEmployee = employees.find((employee) => getEmployeeValue(employee, 'employeeId') === 'selectedEmployeeId');
+  const selectedEmployee = employees.find((employee) => getEmployeeValue(employee, 'employeeId') === selectedEmployeeId);
   const bookedVehicles = bookings.filter((booking) => booking.status === 'Booked');
   const enteredVehicles = bookings.filter((booking) => booking.status === 'Entered');
   const today = new Date();
@@ -171,6 +170,7 @@ export default function Dashboard() {
 
     return hourlyCounts;
   });
+
   const heroCards = [
     { label: 'Sedan Capacity', value: stats.sedanSlots, icon: FaCarAlt },
     { label: 'CSUV Capacity', value: stats.csuvSlots, icon: FaCarSide },
@@ -443,7 +443,6 @@ export default function Dashboard() {
           </div>
         </aside>
       </section>
-
 <Modal
   isOpen={Boolean(operation)}
   onClose={() => setOperation(null)}
@@ -608,3 +607,4 @@ function VehicleList({ bookings, emptyMessage, actionLabel, onAction, error }) {
     </div>
   );
 }
+
