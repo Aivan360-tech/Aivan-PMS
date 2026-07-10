@@ -14,10 +14,18 @@ import {
   FaUsers,
   FaWarehouse,
 } from 'react-icons/fa';
-import parkingData from '../data/parkingData.json';
+import {
+  createBooking,
+  markVehicleEntered,
+  markVehicleExited,
+  useParkingStore,
+} from '../utils/parkingStorage.js';
+
+
 import ParkingSlotCard from '../components/parking/ParkingSlotCard.jsx';
 import MetricCard from '../components/ui/MetricCard.jsx';
 import PageHeader from '../components/ui/PageHeader.jsx';
+import Modal from '../components/Modal.jsx';
 import { getEmployeeValue, useEmployees } from '../utils/employeeStorage.js';
 import { getParkingStats } from '../utils/parkingStats.js';
 
@@ -69,20 +77,25 @@ function getHeatmapTone(value) {
   return 'bg-slate-200 text-slate-600';
 }
 
-function getZoneSlots(zone) {
+function getZoneSlots(zone,slots) {
   const basementMap = {
     Ground: 'B1',
     Puzzle: 'B2',
     Stack: 'B3',
   };
 
-  return parkingData.filter((slot) => slot.basement === basementMap[zone]);
+  return slots.filter((slot) => slot.basement === basementMap[zone]);
 }
 
 export default function Dashboard() {
+  const { slots: parkingData, bookings } = useParkingStore();
   const stats = getParkingStats(parkingData);
   const employees = useEmployees();
   const [employeeQuery, setEmployeeQuery] = useState('');
+  const [operation, setOperation] = useState(null);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+  const [selectedSlotId, setSelectedSlotId] = useState('');
+  const [operationError, setOperationError] = useState('');
   const occupiedPercentage = Math.round((stats.occupiedSlots / stats.totalSlots) * 100);
   const availablePercentage = Math.round((stats.availableSlots / stats.totalSlots) * 100);
 
@@ -117,7 +130,7 @@ export default function Dashboard() {
   }, [employeeQuery, employees]);
 
   const zoneAvailability = ['Ground', 'Puzzle', 'Stack'].map((zone) => {
-    const zoneSlots = getZoneSlots(zone);
+    const zoneSlots = getZoneSlots(zone, parkingData);
     const available = zoneSlots.filter((slot) => slot.allocation === 'Available').length;
     const total = zoneSlots.length;
     const percentage = total ? Math.round((available / total) * 100) : 0;
@@ -133,6 +146,12 @@ export default function Dashboard() {
   });
 
   const featuredSlots = parkingData.slice(0, 6);
+  const availableSlots = parkingData.filter((slot) => slot.allocation === 'Available');
+  const selectedEmployee = employees.find(
+    (employee) => getEmployeeValue(employee, 'employeeId') === selectedEmployeeId,
+  );
+  const bookedVehicles = bookings.filter((booking) => booking.status === 'Booked');
+  const enteredVehicles = bookings.filter((booking) => booking.status === 'Entered');
   const heroCards = [
     { label: 'Sedan Capacity', value: stats.sedanSlots, icon: FaCarAlt },
     { label: 'CSUV Capacity', value: stats.csuvSlots, icon: FaCarSide },
@@ -190,6 +209,12 @@ export default function Dashboard() {
             key={action.title}
             className="group rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-teal-200 hover:shadow-lg"
             type="button"
+            onClick={() => {
+              setOperation(action.title);
+              setOperationError('');
+              setSelectedEmployeeId('');
+              setSelectedSlotId('');
+            }}
           >
             <div className="flex items-start justify-between gap-4">
               <div className={`flex h-12 w-12 items-center justify-center rounded-lg ${action.accent}`}>
@@ -399,6 +424,168 @@ export default function Dashboard() {
           </div>
         </aside>
       </section>
+
+<Modal
+  isOpen={Boolean(operation)}
+  onClose={() => setOperation(null)}
+  title={operation || ''}
+  size="lg"
+>
+  {operation === 'Book Parking' && (
+    <form
+      className="space-y-5"
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        if (!selectedEmployee || !selectedSlotId) {
+          setOperationError('Select an employee and an available parking slot.');
+          return;
+        }
+
+        try {
+          createBooking({ employee: selectedEmployee, slotId: selectedSlotId });
+          setOperation(null);
+        } catch (error) {
+          setOperationError(error.message);
+        }
+      }}
+    >
+      <div>
+        <label className="text-sm font-bold text-slate-700">Employee</label>
+        <select
+          className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none focus:border-teal-600"
+          value={selectedEmployeeId}
+          onChange={(event) => setSelectedEmployeeId(event.target.value)}
+        >
+          <option value="">Select an employee</option>
+
+          {employees.map((employee) => {
+            const id = getEmployeeValue(employee, 'employeeId');
+
+            return (
+              <option key={id} value={id}>
+                {id} - {getEmployeeValue(employee, 'employeeName')} (
+                {getEmployeeValue(employee, 'vehicleNumber') || 'No vehicle'})
+              </option>
+            );
+          })}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-sm font-bold text-slate-700">
+          Available parking slot
+        </label>
+
+        <select
+          className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none focus:border-teal-600"
+          value={selectedSlotId}
+          onChange={(event) => setSelectedSlotId(event.target.value)}
+        >
+          <option value="">Select an available slot</option>
+
+          {availableSlots.map((slot) => (
+            <option key={slot.id} value={slot.id}>
+              {slot.slotNumber} - {slot.basement} / {slot.parkingType}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {operationError && (
+        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
+          {operationError}
+        </p>
+      )}
+
+      <button
+        className="w-full rounded-lg bg-teal-700 px-4 py-3 text-sm font-bold text-white hover:bg-teal-800"
+        type="submit"
+      >
+        Confirm Booking
+      </button>
+    </form>
+  )}
+
+  {operation === 'Vehicle Entry' && (
+    <VehicleList
+      bookings={bookedVehicles}
+      emptyMessage="No booked vehicles are waiting for entry."
+      actionLabel="Mark Entered"
+      error={operationError}
+      onAction={(booking) => {
+        try {
+          markVehicleEntered(booking.id);
+          setOperation(null);
+        } catch (error) {
+          setOperationError(error.message);
+        }
+      }}
+    />
+  )}
+
+  {operation === 'Vehicle Exit' && (
+    <VehicleList
+      bookings={enteredVehicles}
+      emptyMessage="No entered vehicles are ready for exit."
+      actionLabel="Mark Exited"
+      error={operationError}
+      onAction={(booking) => {
+        try {
+          markVehicleExited(booking.id);
+          setOperation(null);
+        } catch (error) {
+          setOperationError(error.message);
+        }
+      }}
+    />
+  )}
+</Modal>
+
+    </div>
+  );
+}
+
+function VehicleList({ bookings, emptyMessage, actionLabel, onAction, error }) {
+  if (!bookings.length) {
+    return (
+      <p className="py-6 text-center text-sm font-semibold text-slate-500">
+        {emptyMessage}
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {error && (
+        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
+          {error}
+        </p>
+      )}
+
+      {bookings.map((booking) => (
+        <div
+          key={booking.id}
+          className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="font-bold text-slate-950">
+              {booking.vehicleNumber || 'Vehicle not recorded'}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {booking.employeeName} - {booking.slotNumber} ({booking.basement})
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onAction(booking)}
+            className="rounded-lg bg-teal-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-teal-800"
+          >
+            {actionLabel}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

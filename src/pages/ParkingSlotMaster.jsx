@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { FaDownload, FaFilter, FaSearch } from 'react-icons/fa';
-import parkingData from '../data/parkingData.json';
 import ParkingSlotCard from '../components/parking/ParkingSlotCard.jsx';
 import ParkingSlotTable from '../components/parking/ParkingSlotTable.jsx';
 import PageHeader from '../components/ui/PageHeader.jsx';
+import { useParkingStore } from '../utils/parkingStorage.js';
 
 export default function ParkingSlotMaster() {
+  const { slots: parkingData } = useParkingStore();
   const [query, setQuery] = useState('');
   const [parkingType, setParkingType] = useState('All');
 
@@ -27,7 +28,7 @@ export default function ParkingSlotMaster() {
 
       return matchesType && searchable.includes(normalizedQuery);
     });
-  }, [parkingType, query]);
+  }, [parkingData, parkingType, query]);
 
   return (
     <div className="space-y-6">
