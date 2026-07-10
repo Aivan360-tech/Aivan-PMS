@@ -1,13 +1,18 @@
 export function getParkingStats(parkingSlots) {
-  const uniquePuzzles = new Set(parkingSlots.map((slot) => slot.puzzleNumber));
+  const availableSlots = parkingSlots.filter((slot) => slot.allocation === 'Available').length;
+  const occupiedSlots = parkingSlots.filter((slot) => ['Allocated', 'Reserved'].includes(slot.allocation)).length;
 
   return {
     totalSlots: parkingSlots.length,
+    availableSlots,
+    occupiedSlots,
     employeeSlots: parkingSlots.filter((slot) => slot.parkingType === 'Employee').length,
     visitorSlots: parkingSlots.filter((slot) => slot.parkingType === 'Visitor').length,
     sedanSlots: parkingSlots.filter((slot) => slot.vehicleSlotType === 'Sedan').length,
     csuvSlots: parkingSlots.filter((slot) => slot.vehicleSlotType === 'CSUV').length,
-    puzzleSlots: uniquePuzzles.size,
+    puzzleSlots: parkingSlots.filter((slot) => slot.basement === 'B2').length,
+    stackSlots: parkingSlots.filter((slot) => slot.basement === 'B3').length,
+    groundSlots: parkingSlots.filter((slot) => slot.basement === 'B1').length,
   };
 }
 

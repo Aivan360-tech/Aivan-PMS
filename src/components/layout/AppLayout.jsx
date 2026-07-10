@@ -1,9 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { FaBell, FaBuilding, FaCarSide, FaChartPie, FaParking, FaUserCircle } from 'react-icons/fa';
+import { FaBell, FaBuilding, FaCarSide, FaChartPie, FaParking, FaUserCircle, FaUserTie } from 'react-icons/fa';
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: FaChartPie },
   { label: 'Parking Slot Master', path: '/parking-slot-master', icon: FaParking },
+  { label: 'Employee Master', path: '/employee-master', icon: FaUserTie },
 ];
 
 export default function AppLayout() {

@@ -9,14 +9,17 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@tailwindcss/vite": "latest",
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-router-dom": "latest",
     "react-icons": "latest",
+    "react-router-dom": "latest",
     "tailwindcss": "latest",
-    "@tailwindcss/vite": "latest"
+    "vite": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.2",
+    "autoprefixer": "^10.5.2"
+  }
 }
