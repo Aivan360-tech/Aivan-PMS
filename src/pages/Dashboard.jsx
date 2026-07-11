@@ -28,6 +28,17 @@ import Modal from '../components/Modal.jsx';
 import { getEmployeeValue, useEmployees } from '../utils/employeeStorage.js';
 import { getParkingStats } from '../utils/parkingStats.js';
 
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+
 const quickActions = [
   {
     title: 'Book Parking',
@@ -56,7 +67,6 @@ const heatmapTimes = Array.from({ length: 24 }, (_, hour) => {
   return `${hour - 12} PM`;
 });
 
-// ADD THIS LINE RIGHT HERE:
 const heatmapDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const recentActivity = [
@@ -93,6 +103,7 @@ export default function Dashboard() {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
   const [selectedSlotId, setSelectedSlotId] = useState('');
   const [operationError, setOperationError] = useState('');
+  const [slotTypeFilter, setSlotTypeFilter] = useState('All');
   const occupiedPercentage = Math.round((stats.occupiedSlots / stats.totalSlots) * 100);
   const availablePercentage = Math.round((stats.availableSlots / stats.totalSlots) * 100);
 
@@ -141,8 +152,29 @@ export default function Dashboard() {
 
     return { status, count, percentage };
   });
+  
+  const liveParkingSlots = parkingData.filter((slot) => {
+    if (slotTypeFilter === 'All') return true;
+    return (slot.vehicleSlotType || slot.vehicleType) === slotTypeFilter;
+  });
 
-  const featuredSlots = parkingData.slice(0, 6);
+  const occupancyChartData = ['All', 'Sedan', 'CSUV'].map((vehicleType) => {
+    const slots =
+      vehicleType === 'All'
+        ? parkingData
+        : parkingData.filter(
+            (slot) => (slot.vehicleSlotType || slot.vehicleType) === vehicleType,
+          );
+
+    return {
+      vehicleType,
+      occupied: slots.filter((slot) =>
+        ['Reserved', 'Allocated'].includes(slot.allocation),
+      ).length,
+      available: slots.filter((slot) => slot.allocation === 'Available').length,
+    };
+  });
+
   const availableSlots = parkingData.filter((slot) => slot.allocation === 'Available');
   const selectedEmployee = employees.find((employee) => getEmployeeValue(employee, 'employeeId') === selectedEmployeeId);
   const bookedVehicles = bookings.filter((booking) => booking.status === 'Booked');
@@ -341,9 +373,13 @@ export default function Dashboard() {
                     {time}
                   </div>
                 ))}
+
                 {heatmapDays.map((day, dayIndex) => (
                   <div key={day} className="contents">
-                    <div className="flex items-center text-sm font-bold text-slate-600">{day}</div>
+                    <div className="flex items-center text-sm font-bold text-slate-600">
+                      {day}
+                    </div>
+
                     {heatmapData[dayIndex].map((value, valueIndex) => (
                       <div
                         key={`${day}-${heatmapTimes[valueIndex]}`}
@@ -356,6 +392,45 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-slate-200 pt-5">
+            <div>
+              <h3 className="text-lg font-bold text-slate-950">
+                Vehicle Type Occupancy
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                Live occupied and available slot counts by vehicle type.
+              </p>
+            </div>
+
+            <div className="mt-5 h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={occupancyChartData}
+                  margin={{ top: 8, right: 12, left: -12, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="vehicleType" tickLine={false} axisLine={false} />
+                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+                  <Tooltip />
+                  <Legend />
+
+                  <Bar
+                    dataKey="occupied"
+                    name="Occupied"
+                    fill="#0f766e"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="available"
+                    name="Available"
+                    fill="#38bdf8"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
@@ -412,10 +487,34 @@ export default function Dashboard() {
               <h2 className="text-lg font-bold text-slate-950">Live Slot Cards</h2>
               <p className="text-sm text-slate-500">Generated dynamically from local JSON data.</p>
             </div>
-            <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-bold text-teal-700">{parkingData.length} slots</span>
+            <div className="flex flex-wrap items-center gap-3">
+              <div
+                className="flex items-center gap-3 text-sm font-semibold text-slate-600"
+                role="radiogroup"
+                aria-label="Filter parking slots by vehicle type"
+              >
+                {['All', 'Sedan', 'CSUV'].map((type) => (
+                  <label key={type} className="flex cursor-pointer items-center gap-1.5">
+                    <input
+                      type="radio"
+                      name="slotType"
+                      value={type}
+                      checked={slotTypeFilter === type}
+                      onChange={(event) => setSlotTypeFilter(event.target.value)}
+                      className="accent-teal-700"
+                    />
+                    {type}
+                  </label>
+                ))}
+              </div>
+
+              <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-bold text-teal-700">
+                {liveParkingSlots.length} slots
+              </span>
+            </div>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
-            {featuredSlots.map((slot) => (
+            {liveParkingSlots.map((slot) => (
               <ParkingSlotCard key={slot.id} slot={slot} />
             ))}
           </div>
@@ -446,122 +545,123 @@ export default function Dashboard() {
           </div>
         </aside>
       </section>
-<Modal
-  isOpen={Boolean(operation)}
-  onClose={() => setOperation(null)}
-  title={operation || ''}
-  size="lg"
->
-  {operation === 'Book Parking' && (
-    <form
-      className="space-y-5"
-      onSubmit={(event) => {
-        event.preventDefault();
-
-        if (!selectedEmployee || !selectedSlotId) {
-          setOperationError('Select an employee and an available parking slot.');
-          return;
-        }
-
-        try {
-          createBooking({ employee: selectedEmployee, slotId: selectedSlotId });
-          setOperation(null);
-        } catch (error) {
-          setOperationError(error.message);
-        }
-      }}
-    >
-      <div>
-        <label className="text-sm font-bold text-slate-700">Employee</label>
-        <select
-          className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none focus:border-teal-600"
-          value={selectedEmployeeId}
-          onChange={(event) => setSelectedEmployeeId(event.target.value)}
-        >
-          <option value="">Select an employee</option>
-
-          {employees.map((employee) => {
-            const id = getEmployeeValue(employee, 'employeeId');
-
-            return (
-              <option key={id} value={id}>
-                {id} - {getEmployeeValue(employee, 'employeeName')} (
-                {getEmployeeValue(employee, 'vehicleNumber') || 'No vehicle'})
-              </option>
-            );
-          })}
-        </select>
-      </div>
-
-      <div>
-        <label className="text-sm font-bold text-slate-700">
-          Available parking slot
-        </label>
-
-        <select
-          className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none focus:border-teal-600"
-          value={selectedSlotId}
-          onChange={(event) => setSelectedSlotId(event.target.value)}
-        >
-          <option value="">Select an available slot</option>
-
-          {availableSlots.map((slot) => (
-            <option key={slot.id} value={slot.id}>
-              {slot.slotNumber} - {slot.basement} / {slot.parkingType}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {operationError && (
-        <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
-          {operationError}
-        </p>
-      )}
-
-      <button
-        className="w-full rounded-lg bg-teal-700 px-4 py-3 text-sm font-bold text-white hover:bg-teal-800"
-        type="submit"
+      
+      <Modal
+        isOpen={Boolean(operation)}
+        onClose={() => setOperation(null)}
+        title={operation || ''}
+        size="lg"
       >
-        Confirm Booking
-      </button>
-    </form>
-  )}
+        {operation === 'Book Parking' && (
+          <form
+            className="space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault();
 
-  {operation === 'Vehicle Entry' && (
-    <VehicleList
-      bookings={bookedVehicles}
-      emptyMessage="No booked vehicles are waiting for entry."
-      actionLabel="Mark Entered"
-      error={operationError}
-      onAction={(booking) => {
-        try {
-          markVehicleEntered(booking.id);
-          setOperation(null);
-        } catch (error) {
-          setOperationError(error.message);
-        }
-      }}
-    />
-  )}
+              if (!selectedEmployee || !selectedSlotId) {
+                setOperationError('Select an employee and an available parking slot.');
+                return;
+              }
 
-  {operation === 'Vehicle Exit' && (
-    <VehicleList
-      bookings={enteredVehicles}
-      emptyMessage="No entered vehicles are ready for exit."
-      actionLabel="Mark Exited"
-      error={operationError}
-      onAction={(booking) => {
-        try {
-          markVehicleExited(booking.id);
-          setOperation(null);
-        } catch (error) {
-          setOperationError(error.message);
-        }
-      }}
-    />
-  )}
-</Modal>
+              try {
+                createBooking({ employee: selectedEmployee, slotId: selectedSlotId });
+                setOperation(null);
+              } catch (error) {
+                setOperationError(error.message);
+              }
+            }}
+          >
+            <div>
+              <label className="text-sm font-bold text-slate-700">Employee</label>
+              <select
+                className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none focus:border-teal-600"
+                value={selectedEmployeeId}
+                onChange={(event) => setSelectedEmployeeId(event.target.value)}
+              >
+                <option value="">Select an employee</option>
+
+                {employees.map((employee) => {
+                  const id = getEmployeeValue(employee, 'employeeId');
+
+                  return (
+                    <option key={id} value={id}>
+                      {id} - {getEmployeeValue(employee, 'employeeName')} (
+                      {getEmployeeValue(employee, 'vehicleNumber') || 'No vehicle'})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-slate-700">
+                Available parking slot
+              </label>
+
+              <select
+                className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-900 outline-none focus:border-teal-600"
+                value={selectedSlotId}
+                onChange={(event) => setSelectedSlotId(event.target.value)}
+              >
+                <option value="">Select an available slot</option>
+
+                {availableSlots.map((slot) => (
+                  <option key={slot.id} value={slot.id}>
+                    {slot.slotNumber} - {slot.basement} / {slot.parkingType}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {operationError && (
+              <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
+                {operationError}
+              </p>
+            )}
+
+            <button
+              className="w-full rounded-lg bg-teal-700 px-4 py-3 text-sm font-bold text-white hover:bg-teal-800"
+              type="submit"
+            >
+              Confirm Booking
+            </button>
+          </form>
+        )}
+
+        {operation === 'Vehicle Entry' && (
+          <VehicleList
+            bookings={bookedVehicles}
+            emptyMessage="No booked vehicles are waiting for entry."
+            actionLabel="Mark Entered"
+            error={operationError}
+            onAction={(booking) => {
+              try {
+                markVehicleEntered(booking.id);
+                setOperation(null);
+              } catch (error) {
+                setOperationError(error.message);
+              }
+            }}
+          />
+        )}
+
+        {operation === 'Vehicle Exit' && (
+          <VehicleList
+            bookings={enteredVehicles}
+            emptyMessage="No entered vehicles are ready for exit."
+            actionLabel="Mark Exited"
+            error={operationError}
+            onAction={(booking) => {
+              try {
+                markVehicleExited(booking.id);
+                setOperation(null);
+              } catch (error) {
+                setOperationError(error.message);
+              }
+            }}
+          />
+        )}
+      </Modal>
 
     </div>
   );
