@@ -182,8 +182,7 @@ export default function Dashboard() {
   const selectedEmployee = employees.find((employee) => getEmployeeValue(employee, 'employeeId') === selectedEmployeeId);
   const bookedVehicles = bookings.filter((booking) => booking.status === 'Booked');
   const enteredVehicles = bookings.filter((booking) => booking.status === 'Entered');
-  const today = new Date();
-  const currentWeekdayIndex = (today.getDay() + 6) % 7; // Monday = 0
+  
 
   const today = new Date();
   const currentWeekdayIndex = (today.getDay() + 6) % 7; // Monday = 0
@@ -440,7 +439,7 @@ export default function Dashboard() {
               <p className="mt-1 text-sm text-slate-500">
                 Live occupied and available slot counts by vehicle type.
               </p>
-            </div>
+            </div> 
 
             <div className="mt-5 h-72">
               <ResponsiveContainer width="100%" height="100%">
