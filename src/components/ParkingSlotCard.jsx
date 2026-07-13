@@ -29,7 +29,6 @@ function resolveSlotBookingInfo(slot, bookings) {
     }
   }
 
-  // Fall back to fields that may already live directly on the slot record.
   return {
     employeeName: slot.employeeName,
     employeeId: slot.employeeId,
@@ -40,33 +39,46 @@ function resolveSlotBookingInfo(slot, bookings) {
   }
 }
 
-// Explicit two-color scheme: green = available, orange = booked/occupied
-// (anything that isn't "Available" - Allocated, Reserved, etc.).
-function getSlotVisualStyle(allocation) {
+// green = available, orange = booked/occupied (anything not "Available")
+function getSlotColors(allocation) {
   if (allocation === 'Available') {
-    return {
-      bg: 'bg-emerald-100',
-      text: 'text-emerald-700',
-      dot: 'bg-emerald-500',
-    }
+    return { background: '#d1fae5', color: '#047857', border: '#34d399' }
   }
+  return { background: '#fef3c7', color: '#b45309', border: '#fbbf24' }
+}
 
-  return {
-    bg: 'bg-amber-100',
-    text: 'text-amber-700',
-    dot: 'bg-amber-500',
-  }
+// Inline styles are used for the square's own size/shape so this can never
+// be affected by a project's Tailwind config, purge settings, or missing
+// arbitrary-value support.
+const squareStyle = {
+  width: 30,
+  height: 30,
+  minWidth: 30,
+  minHeight: 30,
+  maxWidth: 30,
+  maxHeight: 30,
+  borderRadius: 6,
+  borderWidth: 1,
+  borderStyle: 'solid',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 0,
+  cursor: 'default',
+  fontSize: 8,
+  fontWeight: 700,
+  lineHeight: 1,
+  textAlign: 'center',
+  overflow: 'hidden',
 }
 
 export default function ParkingSlotCard({ slot, bookings }) {
   const [showTooltip, setShowTooltip] = useState(false)
-  const slotStyle = getSlotVisualStyle(slot.allocation)
+  const colors = getSlotColors(slot.allocation)
   const parkingTypeStyle = getParkingTypeColor(slot.parkingType)
   const bookingInfo = resolveSlotBookingInfo(slot, bookings)
 
   const fullLabel = [slot.basement, slot.slotNumber].filter(Boolean).join('-')
-  // Basement is already implied by the filter/section context, so the tiny
-  // icon only needs to show the short slot code (e.g. "P01-S1").
   const shortLabel = slot.slotNumber?.startsWith?.(`${slot.basement}-`)
     ? slot.slotNumber.slice(slot.basement.length + 1)
     : slot.slotNumber || fullLabel
@@ -85,26 +97,48 @@ export default function ParkingSlotCard({ slot, bookings }) {
 
   return (
     <div
-      className="relative inline-flex"
+      style={{ position: 'relative', display: 'inline-block' }}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
-      onFocus={() => setShowTooltip(true)}
-      onBlur={() => setShowTooltip(false)}
     >
-      <button
-        type="button"
+      <div
         title={fullLabel}
-        className={`flex h-7 w-7 flex-col items-center justify-center rounded border text-center transition-transform duration-150 sm:h-8 sm:w-8 ${slotStyle.bg} ${slotStyle.text} ${showTooltip ? 'z-20 scale-125 shadow-md' : ''}`}
-        style={{ borderColor: 'currentColor' }}
+        style={{
+          ...squareStyle,
+          backgroundColor: colors.background,
+          color: colors.color,
+          borderColor: colors.border,
+        }}
       >
-        <span className="px-0.5 text-[6.5px] font-bold leading-[1.05] sm:text-[7px]">{shortLabel}</span>
-      </button>
+        {shortLabel}
+      </div>
 
       {showTooltip && (
-        <div className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 w-56 -translate-x-1/2 rounded-lg border border-slate-200 bg-white p-3 text-left shadow-lg">
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            marginTop: 8,
+            width: 224,
+            zIndex: 50,
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: 8,
+            padding: 12,
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+            textAlign: 'left',
+          }}
+        >
           <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
             <span className="text-sm font-bold text-slate-950">{fullLabel}</span>
-            <span className={`badge ${slotStyle.bg} ${slotStyle.text}`}>{slot.allocation}</span>
+            <span
+              className="badge"
+              style={{ backgroundColor: colors.background, color: colors.color }}
+            >
+              {slot.allocation}
+            </span>
           </div>
 
           <dl className="mt-2 space-y-1">
