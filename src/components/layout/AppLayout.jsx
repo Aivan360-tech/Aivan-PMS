@@ -83,10 +83,7 @@ export default function AppLayout() {
               ))}
             </nav>
 
-            <div className="hidden lg:block">
-              <p className="text-sm font-medium text-slate-500">Operations Overview</p>
-              <p className="text-lg font-bold text-slate-950">Parking Management System</p>
-            </div>
+            <div className="hidden lg:block w-64"></div>
 
             <div className="flex items-center justify-between gap-3 lg:justify-end">
               <button className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="Notifications">

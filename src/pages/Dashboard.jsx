@@ -23,7 +23,6 @@ import {
 
 import ParkingSlotCard from '../components/parking/ParkingSlotCard.jsx';
 import MetricCard from '../components/ui/MetricCard.jsx';
-import PageHeader from '../components/ui/PageHeader.jsx';
 import Modal from '../components/Modal.jsx';
 import { getEmployeeValue, useEmployees } from '../utils/employeeStorage.js';
 import { getParkingStats } from '../utils/parkingStats.js';
@@ -77,7 +76,7 @@ const recentActivity = [
 ];
 
 const basementFilters = ['All', 'B1', 'B2', 'B3'];
-const SLOTS_PER_PAGE = 10;
+const SLOTS_PER_PAGE = 32;
 
 function getHeatmapTone(value, isCurrentDay) {
   if (!isCurrentDay) {
@@ -204,6 +203,29 @@ export default function Dashboard() {
     };
   });
 
+  // Tower A summary: available/total slot counts per vehicle type (Sedan,
+  // CSUV) broken down by basement (B1, B2, B3). Derived purely from the
+  // existing parkingData - no new business logic, no hardcoded numbers.
+  const towerBasements = ['B1', 'B2', 'B3'];
+  const towerVehicleTypes = ['Sedan', 'CSUV'];
+
+  const towerSummary = towerVehicleTypes.map((vehicleType) => {
+    const basementCounts = towerBasements.map((basement) => {
+      const slots = parkingData.filter(
+        (slot) =>
+          slot.basement === basement &&
+          (slot.vehicleSlotType || slot.vehicleType) === vehicleType,
+      );
+
+      const total = slots.length;
+      const available = slots.filter((slot) => slot.allocation === 'Available').length;
+
+      return { basement, available, total };
+    });
+
+    return { vehicleType, basementCounts };
+  });
+
   const availableSlots = parkingData.filter((slot) => slot.allocation === 'Available');
   const selectedEmployee = employees.find((employee) => getEmployeeValue(employee, 'employeeId') === selectedEmployeeId);
   const bookedVehicles = bookings.filter((booking) => booking.status === 'Booked');
@@ -276,20 +298,14 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
-      <PageHeader
-        eyebrow="Dashboard"
-        title="Smart Parking Management System"
-        description="Monitor live capacity, quick gate operations, zone availability, vehicle movement, and traffic intensity from one enterprise dashboard."
-      />
+      <h1 className="text-2xl font-bold text-slate-950">Dashboard</h1>
 
       <section className="overflow-hidden rounded-lg border border-slate-200 bg-slate-950 shadow-sm">
         <div className="grid gap-4 p-4 text-white lg:grid-cols-[1fr_320px] lg:p-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-300">Live Facility Status</p>
-            <h2 className="mt-2 text-xl font-bold tracking-normal sm:text-2xl">Tower A Parking Operations</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-              Current slot visibility across ground, puzzle, and stack parking zones with demo command actions for front-desk operations.
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-300">Live  Status</p>
+            <h2 className="mt-2 text-xl font-bold tracking-normal sm:text-2xl">Tower A Parking </h2>
+            
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               {heroCards.map((item) => (
                 <div key={item.label} className="rounded-lg border border-white/10 bg-white/10 p-3">
@@ -315,6 +331,86 @@ export default function Dashboard() {
               <div className="h-2.5 rounded-full bg-teal-300" style={{ width: `${availablePercentage}%` }} />
             </div>
             <p className="mt-2 text-xs text-slate-300">{availablePercentage}% of total slots are available for allocation.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Tower A Summary & Vehicle Type Occupancy */}
+      <section className="grid gap-4 lg:grid-cols-2">
+        {/* Tower A Summary Table */}
+        <div className="flex h-full flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div>
+            <h2 className="text-base font-bold text-slate-950">Tower A</h2>
+            <p className="mt-0.5 text-sm text-slate-500">
+              Available / total slot counts per vehicle type across each basement.
+            </p>
+          </div>
+
+          <div className="mt-3 flex-1 overflow-hidden rounded-lg border border-slate-200">
+            <table className="w-full border-collapse text-left text-sm">
+              <thead className="bg-slate-100 text-xs uppercase tracking-[0.12em] text-slate-500">
+                <tr>
+                  <th className="px-4 py-3 font-bold">Vehicle Type</th>
+                  {towerBasements.map((basement) => (
+                    <th key={basement} className="px-4 py-3 text-center font-bold">
+                      {basement}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {towerSummary.map((row) => (
+                  <tr key={row.vehicleType} className="hover:bg-slate-50">
+                    <td className="px-4 py-3 font-semibold text-slate-900">{row.vehicleType}</td>
+                    {row.basementCounts.map(({ basement, available, total }) => (
+                      <td key={basement} className="px-4 py-3 text-center">
+                        <span className="font-bold text-emerald-600">{available}</span>
+                        <span className="text-slate-400"> / </span>
+                        <span className="font-bold text-slate-950">{total}</span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Vehicle Type Occupancy */}
+        <div className="flex h-full flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div>
+            <h2 className="text-base font-bold text-slate-950">Vehicle Type Occupancy</h2>
+            <p className="mt-0.5 text-sm text-slate-500">
+              Live occupied and available slot counts by vehicle type.
+            </p>
+          </div>
+
+          <div className="mt-3 h-44 flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={occupancyChartData}
+                margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="vehicleType" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+                <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} width={30} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
+
+                <Bar
+                  dataKey="occupied"
+                  name="Occupied"
+                  fill="#0f766e"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="available"
+                  name="Available"
+                  fill="#38bdf8"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </section>
@@ -482,44 +578,6 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Vehicle Type Occupancy */}
-      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <div>
-          <h2 className="text-base font-bold text-slate-950">Vehicle Type Occupancy</h2>
-          <p className="mt-0.5 text-sm text-slate-500">
-            Live occupied and available slot counts by vehicle type.
-          </p>
-        </div>
-
-        <div className="mt-3 h-44">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={occupancyChartData}
-              margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="vehicleType" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-              <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12 }} width={30} />
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
-
-              <Bar
-                dataKey="occupied"
-                name="Occupied"
-                fill="#0f766e"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="available"
-                name="Available"
-                fill="#38bdf8"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
         </div>
       </section>
 

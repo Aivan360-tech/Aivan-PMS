@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { MdDirectionsCar, MdVideocam } from 'react-icons/md'
-import { getParkingTypeColor } from '../../utils/helpers';
+import { getParkingTypeColor } from '../../utils/helpers'
 
 // Tries to find booking details linked to this slot without touching any
 // booking logic - just reads existing data so the tooltip has something to
@@ -51,12 +51,12 @@ function getSlotColors(allocation) {
 // be affected by a project's Tailwind config, purge settings, or missing
 // arbitrary-value support.
 const squareStyle = {
-  width: 30,
-  height: 30,
-  minWidth: 30,
-  minHeight: 30,
-  maxWidth: 30,
-  maxHeight: 30,
+  width: 60,
+  height: 60,
+  minWidth: 60,
+  minHeight: 60,
+  maxWidth: 60,
+  maxHeight: 60,
   borderRadius: 6,
   borderWidth: 1,
   borderStyle: 'solid',
@@ -65,7 +65,7 @@ const squareStyle = {
   justifyContent: 'center',
   padding: 0,
   cursor: 'default',
-  fontSize: 8,
+  fontSize: 15,
   fontWeight: 700,
   lineHeight: 1,
   textAlign: 'center',
@@ -79,7 +79,7 @@ export default function ParkingSlotCard({ slot, bookings }) {
   const bookingInfo = resolveSlotBookingInfo(slot, bookings)
 
   const fullLabel = [slot.basement, slot.slotNumber].filter(Boolean).join('-')
-  const TEST123 = slot.slotNumber?.startsWith?.(`${slot.basement}-`)
+  const shortLabel = slot.slotNumber?.startsWith?.(`${slot.basement}-`)
     ? slot.slotNumber.slice(slot.basement.length + 1)
     : slot.slotNumber || fullLabel
 
