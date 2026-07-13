@@ -77,7 +77,7 @@ const recentActivity = [
 ];
 
 const basementFilters = ['All', 'B1', 'B2', 'B3'];
-const SLOTS_PER_PAGE = 10;
+const SLOTS_PER_PAGE = 20;
 
 function getHeatmapTone(value, isCurrentDay) {
   if (!isCurrentDay) {
@@ -175,7 +175,7 @@ export default function Dashboard() {
   const totalSlotPages = Math.max(1, Math.ceil(sortedFilteredSlots.length / SLOTS_PER_PAGE));
   const currentSlotPage = Math.min(slotPage, totalSlotPages);
 
-  // Only ever render one page (10 slots) at a time instead of the full
+  // Only ever render one page (20 slots) at a time instead of the full
   // inventory - Previous / Next below step through the rest.
   const liveParkingSlots = sortedFilteredSlots.slice(
     (currentSlotPage - 1) * SLOTS_PER_PAGE,
