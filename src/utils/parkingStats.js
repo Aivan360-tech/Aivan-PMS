@@ -1,13 +1,23 @@
-export function getParkingStats(parkingSlots) {
+export function getParkingStats(parkingSlots, bookings = []) {
   const availableSlots = parkingSlots.filter((slot) => slot.allocation === 'Available').length;
-  const occupiedSlots = parkingSlots.filter((slot) => ['Allocated', 'Reserved'].includes(slot.allocation)).length;
+
+  // Occupied means the vehicle has actually entered (allocation === 'Allocated').
+  // A slot that is merely booked but not yet entered is "Reserved", not occupied.
+  const occupiedSlots = parkingSlots.filter((slot) => slot.allocation === 'Allocated').length;
+  const reservedSlots = parkingSlots.filter((slot) => slot.allocation === 'Reserved').length;
+
+  // Employee Slots = total slots currently held by an employee booking that
+  // hasn't exited yet (covers both the Reserved and Entered/Occupied stages).
+  // Calculated from live booking data so it updates the moment a booking is
+  // created or a vehicle exits.
+  const employeeSlots = bookings.filter((booking) => ['Booked', 'Entered'].includes(booking.status)).length;
 
   return {
     totalSlots: parkingSlots.length,
     availableSlots,
     occupiedSlots,
-    employeeSlots: parkingSlots.filter((slot) => slot.parkingType === 'Employee').length,
-    visitorSlots: parkingSlots.filter((slot) => slot.parkingType === 'Visitor').length,
+    reservedSlots,
+    employeeSlots,
     sedanSlots: parkingSlots.filter((slot) => slot.vehicleSlotType === 'Sedan').length,
     csuvSlots: parkingSlots.filter((slot) => slot.vehicleSlotType === 'CSUV').length,
     puzzleSlots: parkingSlots.filter((slot) => slot.basement === 'B2').length,

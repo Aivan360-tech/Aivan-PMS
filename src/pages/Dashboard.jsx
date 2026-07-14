@@ -101,7 +101,7 @@ function getZoneSlots(zone, slots) {
 
 export default function Dashboard() {
   const { slots: parkingData, bookings } = useParkingStore();
-  const stats = getParkingStats(parkingData);
+  const stats = getParkingStats(parkingData, bookings);
   const employees = useEmployees();
   const [employeeQuery, setEmployeeQuery] = useState('');
   const [operation, setOperation] = useState(null);
@@ -116,9 +116,9 @@ export default function Dashboard() {
   const metrics = [
     { title: 'Total Slots', value: stats.totalSlots, icon: FaParking, accent: 'bg-teal-50 text-teal-700', note: 'Complete parking inventory' },
     { title: 'Available Slots', value: stats.availableSlots, icon: FaDoorOpen, accent: 'bg-emerald-50 text-emerald-700', note: `${availablePercentage}% currently open` },
-    { title: 'Occupied Slots', value: stats.occupiedSlots, icon: FaCarAlt, accent: 'bg-rose-50 text-rose-700', note: `${occupiedPercentage}% in use or reserved` },
-    { title: 'Employee Slots', value: stats.employeeSlots, icon: FaUserTie, accent: 'bg-indigo-50 text-indigo-700', note: 'Assigned for employees' },
-    { title: 'Visitor Slots', value: stats.visitorSlots, icon: FaUsers, accent: 'bg-sky-50 text-sky-700', note: 'Reserved for visitors' },
+    { title: 'Occupied Slots', value: stats.occupiedSlots, icon: FaCarAlt, accent: 'bg-rose-50 text-rose-700', note: `${occupiedPercentage}% in use (vehicle entered)` },
+    { title: 'Employee Slots', value: stats.employeeSlots, icon: FaUserTie, accent: 'bg-indigo-50 text-indigo-700', note: 'Currently booked or entered' },
+    { title: 'Reserved Slots', value: stats.reservedSlots, icon: FaUsers, accent: 'bg-sky-50 text-sky-700', note: 'Booked, awaiting vehicle entry' },
     { title: 'Puzzle Slots', value: stats.puzzleSlots, icon: FaLayerGroup, accent: 'bg-violet-50 text-violet-700', note: 'Mapped to B2 zone' },
     { title: 'Stack Slots', value: stats.stackSlots, icon: FaWarehouse, accent: 'bg-amber-50 text-amber-700', note: 'Mapped to B3 zone' },
     { title: 'Ground Slots', value: stats.groundSlots, icon: FaRoute, accent: 'bg-slate-100 text-slate-700', note: 'Mapped to B1 zone' },
@@ -142,6 +142,23 @@ export default function Dashboard() {
       return searchable.includes(normalizedQuery);
     });
   }, [employeeQuery, employees]);
+
+  // Employees with an active booking (Booked or Entered) should not be
+  // offered again in the Book Parking form until their vehicle has exited.
+  const activeBookingEmployeeIds = useMemo(
+    () =>
+      new Set(
+        bookings
+          .filter((booking) => ['Booked', 'Entered'].includes(booking.status))
+          .map((booking) => booking.employeeId),
+      ),
+    [bookings],
+  );
+
+  const bookableEmployees = useMemo(
+    () => employees.filter((employee) => !activeBookingEmployeeIds.has(getEmployeeValue(employee, 'employeeId'))),
+    [employees, activeBookingEmployeeIds],
+  );
 
   const zoneAvailability = ['Ground', 'Puzzle', 'Stack'].map((zone) => {
     const zoneSlots = getZoneSlots(zone, parkingData);
@@ -743,7 +760,7 @@ export default function Dashboard() {
               >
                 <option value="">Select an employee</option>
 
-                {employees.map((employee) => {
+                {bookableEmployees.map((employee) => {
                   const id = getEmployeeValue(employee, 'employeeId');
 
                   return (
