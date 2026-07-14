@@ -9,7 +9,7 @@ import {
   FaShieldAlt,
   FaUserShield,
 } from 'react-icons/fa';
-import loginHeroImage from '../assets/login-hero.png';
+import loginHeroImage from '../assets/login-hero.jpg';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,13 +32,20 @@ export default function Login() {
             LEFT — Hero panel (~60% on desktop, top banner on smaller
             screens)
         ============================================================ */}
+        {/* ============================================================
+            LEFT — Hero panel (~60% on desktop, top banner on smaller
+            screens)
+        ============================================================ */}
         <section className="relative min-h-[320px] overflow-hidden bg-slate-950 lg:min-h-screen">
-          {/* Real facility photo, used as a plain edge-to-edge background —
-              no overlay text or scrim, matching the reference mockup. */}
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${loginHeroImage})` }}
-            aria-hidden="true"
+          
+          {/* Optional: Dark overlay to make it look a bit richer if needed */}
+          <div className="absolute inset-0 bg-slate-950/10 z-20 pointer-events-none" aria-hidden="true" />
+
+          {/* Changed object-contain to object-cover to fulfill the container */}
+          <img
+            src={loginHeroImage}
+            alt="ParkWise parking facility entrance"
+            className="absolute inset-0 h-full w-full object-cover z-10"
           />
         </section>
 
