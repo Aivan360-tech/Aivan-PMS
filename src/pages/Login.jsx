@@ -2,27 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FaArrowRight,
-  FaCarSide,
-  FaDoorOpen,
   FaEye,
   FaEyeSlash,
   FaLock,
-  FaParking,
   FaQuestionCircle,
   FaShieldAlt,
   FaUserShield,
-  FaVideo,
 } from 'react-icons/fa';
-
-// Decorative feature badges for the hero panel. Icons stand in for the
-// physical facility features (CCTV, automated entry barrier, guidance
-// signage) called out in the design brief.
-const heroFeatures = [
-  { label: '24/7 CCTV Monitoring', icon: FaVideo },
-  { label: 'Automated Entry Barrier', icon: FaDoorOpen },
-  { label: 'Smart Guidance Signage', icon: FaParking },
-];
-
+import loginHeroImage from '../assets/login-hero.png';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,14 +24,7 @@ export default function Login() {
           from { opacity: 0; transform: translateY(14px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes loginGlowPulse {
-          0%, 100% { opacity: 0.35; }
-          50% { opacity: 0.85; }
-        }
-        .login-fade-up { animation: loginFadeUp 0.6s ease-out both; }
-        .login-fade-up-delay-1 { animation: loginFadeUp 0.6s ease-out 0.1s both; }
         .login-fade-up-delay-2 { animation: loginFadeUp 0.6s ease-out 0.2s both; }
-        .login-glow-pulse { animation: loginGlowPulse 3.5s ease-in-out infinite; }
       `}</style>
 
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[3fr_2fr]">
@@ -52,173 +32,14 @@ export default function Login() {
             LEFT — Hero panel (~60% on desktop, top banner on smaller
             screens)
         ============================================================ */}
-        <section className="relative flex min-h-[300px] items-center overflow-hidden bg-[linear-gradient(135deg,#0f172a_0%,#0d9488_55%,#1e293b_100%)] px-6 py-14 sm:px-10 lg:min-h-screen lg:px-16 lg:py-16">
-          {/* Replaceable background layer. Swap in a real, licensed facility
-              photo later by setting the --login-hero-image custom property
-              (e.g. style={{ '--login-hero-image': 'url(/hero.jpg)' }})
-              on this <section> — no code change required. Until then, the
-              illustrated parking scene below fills that role. */}
+        <section className="relative min-h-[320px] overflow-hidden bg-slate-950 lg:min-h-screen">
+          {/* Real facility photo, used as a plain edge-to-edge background —
+              no overlay text or scrim, matching the reference mockup. */}
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-70 mix-blend-overlay"
-            style={{ backgroundImage: 'var(--login-hero-image, none)' }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${loginHeroImage})` }}
             aria-hidden="true"
           />
-
-          {/* Soft dot-grid texture */}
-          <div className="absolute inset-0 opacity-20" aria-hidden="true">
-            <div className="h-full w-full bg-[radial-gradient(circle_at_20%_20%,#ffffff_0_1px,transparent_1px)] [background-size:28px_28px]" />
-          </div>
-
-          {/* Ambient glow accents */}
-          <div className="login-glow-pulse pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/30 blur-3xl" aria-hidden="true" />
-          <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-teal-300/20 blur-3xl" aria-hidden="true" />
-
-          {/* City skyline with lit windows */}
-          <svg
-            className="pointer-events-none absolute inset-x-0 bottom-24 h-40 w-full opacity-40 sm:bottom-28 sm:h-52"
-            viewBox="0 0 1600 240"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            {[
-              { x: 0, w: 120, h: 130 },
-              { x: 130, w: 80, h: 190 },
-              { x: 220, w: 100, h: 100 },
-              { x: 330, w: 70, h: 220 },
-              { x: 410, w: 110, h: 150 },
-              { x: 530, w: 90, h: 100 },
-              { x: 630, w: 130, h: 200 },
-              { x: 770, w: 80, h: 140 },
-              { x: 860, w: 100, h: 180 },
-              { x: 970, w: 120, h: 110 },
-              { x: 1100, w: 90, h: 210 },
-              { x: 1200, w: 110, h: 150 },
-              { x: 1320, w: 80, h: 190 },
-              { x: 1410, w: 100, h: 120 },
-              { x: 1520, w: 80, h: 170 },
-            ].map((building, index) => (
-              <g key={index}>
-                <rect
-                  x={building.x}
-                  y={240 - building.h}
-                  width={building.w}
-                  height={building.h}
-                  fill="#e2e8f0"
-                />
-                {Array.from({ length: Math.floor(building.h / 26) }).map((_, row) => (
-                  <g key={row}>
-                    <rect x={building.x + building.w * 0.22} y={240 - building.h + 14 + row * 26} width="8" height="10" fill="#fde68a" fillOpacity="0.85" />
-                    <rect x={building.x + building.w * 0.6} y={240 - building.h + 14 + row * 26} width="8" height="10" fill="#fde68a" fillOpacity="0.55" />
-                  </g>
-                ))}
-              </g>
-            ))}
-          </svg>
-
-          {/* Foreground parking facility scene: pavement, boom barrier,
-              CCTV camera, guidance sign, parked cars, and trees. */}
-          <svg
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 w-full sm:h-32 lg:h-36"
-            viewBox="0 0 1600 220"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            {/* Pavement */}
-            <rect x="0" y="60" width="1600" height="160" fill="#0f172a" fillOpacity="0.35" />
-            {[120, 320, 520, 720, 920, 1120, 1320, 1520].map((x) => (
-              <line key={x} x1={x} y1="70" x2={x} y2="200" stroke="#ffffff" strokeOpacity="0.18" strokeWidth="4" strokeDasharray="14 14" />
-            ))}
-
-            {/* Trees */}
-            {[480, 980, 1460].map((x, index) => (
-              <g key={index} transform={`translate(${x}, 118)`}>
-                <rect x="-4" y="26" width="8" height="30" fill="#334155" />
-                <circle cx="0" cy="14" r="26" fill="#059669" fillOpacity="0.9" />
-                <circle cx="-16" cy="26" r="18" fill="#10b981" fillOpacity="0.85" />
-                <circle cx="16" cy="26" r="18" fill="#10b981" fillOpacity="0.85" />
-              </g>
-            ))}
-
-            {/* Boom barrier (open position) */}
-            <g transform="translate(90, 60)">
-              <rect x="-6" y="0" width="14" height="110" rx="3" fill="#f8fafc" />
-              <rect x="-16" y="104" width="34" height="12" rx="2" fill="#0f172a" fillOpacity="0.5" />
-              <g transform="rotate(-58)">
-                <rect x="0" y="-6" width="150" height="12" rx="4" fill="#f8fafc" />
-                {[0, 24, 48, 72, 96, 120].map((offset) => (
-                  <rect key={offset} x={offset} y="-6" width="12" height="12" fill="#facc15" />
-                ))}
-                <circle cx="150" cy="0" r="7" fill="#ef4444" />
-              </g>
-            </g>
-
-            {/* Parking guidance sign */}
-            <g transform="translate(230, 44)">
-              <rect x="-3" y="20" width="6" height="90" fill="#cbd5e1" />
-              <rect x="-38" y="0" width="76" height="46" rx="6" fill="#f8fafc" stroke="#0f766e" strokeWidth="3" />
-              <text x="0" y="24" textAnchor="middle" fontSize="24" fontWeight="700" fill="#0f766e" fontFamily="sans-serif">P</text>
-              <path d="M -22 36 L -6 36 L -14 44 Z" fill="#0f766e" />
-            </g>
-
-            {/* CCTV camera on pole */}
-            <g transform="translate(1360, 30)">
-              <rect x="-3" y="10" width="6" height="80" fill="#cbd5e1" />
-              <g transform="translate(0, 6) rotate(18)">
-                <rect x="-8" y="-10" width="46" height="20" rx="6" fill="#e2e8f0" />
-                <circle cx="34" cy="0" r="7" fill="#0f172a" />
-                <circle cx="34" cy="0" r="3" fill="#38bdf8" />
-              </g>
-              <circle cx="-3" cy="8" r="5" className="login-glow-pulse" fill="#ef4444" />
-            </g>
-
-            {/* Parked cars (side profile), reused via <use> with per-car fill */}
-            <defs>
-              <g id="loginHeroCar">
-                <rect x="0" y="18" width="150" height="26" rx="10" />
-                <path d="M18 18 L34 0 H108 L128 18 Z" />
-                <circle cx="30" cy="46" r="12" fill="#0f172a" fillOpacity="0.75" />
-                <circle cx="120" cy="46" r="12" fill="#0f172a" fillOpacity="0.75" />
-              </g>
-            </defs>
-            {[
-              { x: 360, fill: '#f8fafc', opacity: 0.92 },
-              { x: 610, fill: '#94a3b8', opacity: 0.85 },
-              { x: 860, fill: '#2dd4bf', opacity: 0.8 },
-              { x: 1110, fill: '#e2e8f0', opacity: 0.85 },
-            ].map(({ x, fill, opacity }, index) => (
-              <use key={index} href="#loginHeroCar" x={x} y="150" fill={fill} fillOpacity={opacity} />
-            ))}
-          </svg>
-
-          {/* Soft dark overlay for text legibility over the scene */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" aria-hidden="true" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-slate-950/40 via-transparent to-transparent" aria-hidden="true" />
-
-          <div className="relative w-full max-w-2xl">
-            <div className="login-fade-up flex items-center gap-3">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white text-teal-700 shadow-lg">
-                <FaCarSide className="text-2xl" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold leading-tight tracking-normal sm:text-2xl">Parking Management System</h1>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-200">Smart Enterprise Parking Solution</p>
-              </div>
-            </div>
-
-            <div className="login-fade-up-delay-1 mt-10 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
-              {heroFeatures.map(({ label, icon: Icon }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-3 rounded-lg border border-white/20 bg-white/10 p-4 backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/15"
-                >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white/15 text-teal-200">
-                    <Icon className="text-base" />
-                  </div>
-                  <p className="text-sm font-semibold text-white">{label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
         {/* ============================================================

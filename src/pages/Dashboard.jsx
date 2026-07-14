@@ -603,7 +603,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-3 border-b border-slate-200 pb-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-950">Live Parking Slots</h2>
-            <p className="text-sm text-slate-500">Generated dynamically from local JSON data. Hover a slot for details.</p>
+            
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -684,7 +684,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-950">Traffic Heatmap</h2>
-            <p className="text-sm text-slate-500">Demo occupancy intensity by day and time.</p>
+            
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
             <span className="h-2.5 w-2.5 rounded-sm bg-slate-200" />
