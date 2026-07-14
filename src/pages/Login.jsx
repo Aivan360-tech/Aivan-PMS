@@ -8,6 +8,7 @@ import {
   FaEyeSlash,
   FaLock,
   FaParking,
+  FaQuestionCircle,
   FaShieldAlt,
   FaUserShield,
   FaVideo,
@@ -224,22 +225,26 @@ export default function Login() {
             RIGHT — Login card (~40% on desktop)
         ============================================================ */}
         <section className="flex items-center justify-center bg-slate-50 px-6 py-12 text-slate-900">
-          <div className="login-fade-up-delay-2 w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl transition-shadow duration-300 hover:shadow-2xl sm:p-8">
+          <div className="login-fade-up-delay-2 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl transition-shadow duration-300 hover:shadow-2xl sm:p-8">
             <div className="flex flex-col items-center text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-900/20">
                 <FaShieldAlt className="text-2xl" />
               </div>
               <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-teal-700">Secure Access</p>
-              <h2 className="mt-2 text-2xl font-bold text-slate-950">Welcome Back!</h2>
+              <h2 className="mt-2 text-2xl font-bold text-slate-950 sm:text-[28px]">Welcome Back!</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">Sign in to continue to your dashboard.</p>
             </div>
 
             <form className="mt-8 space-y-5">
               <label className="block">
-                <span className="text-sm font-semibold text-slate-700">Username</span>
+                <span className="text-sm font-semibold text-slate-700">Username / Email</span>
                 <div className="mt-2 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 transition duration-200 focus-within:border-teal-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-teal-100">
                   <FaUserShield className="text-slate-400" />
-                  <input className="w-full border-0 bg-transparent text-sm text-slate-900 outline-none" defaultValue="admin@parkwise.com" />
+                  <input
+                    className="w-full border-0 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                    placeholder="Enter your username or email"
+                    defaultValue="admin@parkwise.com"
+                  />
                 </div>
               </label>
 
@@ -248,8 +253,9 @@ export default function Login() {
                 <div className="mt-2 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 transition duration-200 focus-within:border-teal-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-teal-100">
                   <FaLock className="text-slate-400" />
                   <input
-                    className="w-full border-0 bg-transparent text-sm text-slate-900 outline-none"
+                    className="w-full border-0 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
                     type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
                     defaultValue="parking123"
                   />
                   <button
@@ -274,18 +280,40 @@ export default function Login() {
                   Remember me
                 </label>
                 <button type="button" className="font-semibold text-teal-700 transition hover:text-teal-800 hover:underline">
-                  Forgot password?
+                  Forgot Password?
                 </button>
               </div>
 
               <Link
                 to="/dashboard"
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-700 to-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-teal-900/20"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-teal-700 to-emerald-600 px-4 py-3.5 text-sm font-bold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-teal-900/20"
               >
                 Login to Dashboard
                 <FaArrowRight />
               </Link>
+
+              <div className="flex items-center gap-3 pt-1" aria-hidden="true">
+                <div className="h-px flex-1 bg-slate-200" />
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Or</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+
+              <button
+                type="button"
+                className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition duration-200 hover:-translate-y-0.5 hover:border-teal-600 hover:text-teal-700 hover:shadow-md"
+              >
+                <FaShieldAlt className="text-base" />
+                Login with SSO
+              </button>
             </form>
+
+            <p className="mt-6 text-center text-sm text-slate-500">
+              Need help?{' '}
+              <a href="#contact-support" className="font-semibold text-teal-700 transition hover:text-teal-800 hover:underline">
+                <FaQuestionCircle className="mr-1 inline-block align-[-1px] text-xs" />
+                Contact Support
+              </a>
+            </p>
           </div>
         </section>
       </div>

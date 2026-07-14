@@ -1,5 +1,15 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import { FaBell, FaBuilding, FaCarSide, FaChartPie, FaParking, FaUserCircle, FaUserTie } from 'react-icons/fa';
+import { useEffect, useRef, useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import {
+  FaCarSide,
+  FaChartPie,
+  FaChevronDown,
+  FaParking,
+  FaSignOutAlt,
+  FaUserCircle,
+  FaUserTie,
+  FaBuilding,
+} from 'react-icons/fa';
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: FaChartPie },
@@ -8,6 +18,27 @@ const navItems = [
 ];
 
 export default function AppLayout() {
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Close the Admin User dropdown when clicking anywhere outside of it.
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
+        setIsAccountMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  function handleLogout() {
+    setIsAccountMenuOpen(false);
+    navigate('/login');
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-slate-200 bg-white lg:block">
@@ -55,7 +86,7 @@ export default function AppLayout() {
 
       <div className="lg:pl-72">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
-          <div className="flex min-h-20 flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          <div className="flex min-h-16 flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <div className="flex items-center gap-3 lg:hidden">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-700 text-white">
                 <FaCarSide />
@@ -85,22 +116,46 @@ export default function AppLayout() {
 
             <div className="hidden lg:block w-64"></div>
 
-            <div className="flex items-center justify-between gap-3 lg:justify-end">
-              <button className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="Notifications">
-                <FaBell />
-              </button>
-              <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
-                <FaUserCircle className="text-2xl text-slate-400" />
-                <div className="hidden sm:block">
-                  <p className="text-sm font-bold text-slate-950">Admin User</p>
-                  <p className="text-xs text-slate-500">Facility Manager</p>
-                </div>
+            <div className="flex items-center justify-end gap-3">
+              {/* Admin User — click to reveal a Logout dropdown */}
+              <div className="relative" ref={accountMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsAccountMenuOpen((open) => !open)}
+                  className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 transition hover:bg-slate-50"
+                  aria-haspopup="true"
+                  aria-expanded={isAccountMenuOpen}
+                >
+                  <FaUserCircle className="text-2xl text-slate-400" />
+                  <div className="hidden text-left sm:block">
+                    <p className="text-sm font-bold text-slate-950">Admin User</p>
+                    <p className="text-xs text-slate-500">Facility Manager</p>
+                  </div>
+                  <FaChevronDown
+                    className={`ml-1 hidden text-xs text-slate-400 transition-transform duration-200 sm:block ${
+                      isAccountMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {isAccountMenuOpen && (
+                  <div className="absolute right-0 z-30 mt-2 w-48 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-rose-600"
+                    >
+                      <FaSignOutAlt className="text-sm" />
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </header>
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <main className="px-4 py-3 sm:px-6 lg:px-8 lg:py-4">
           <Outlet />
         </main>
       </div>
