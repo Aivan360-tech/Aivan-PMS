@@ -700,17 +700,19 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Parking Overview */}
-      <section>
+      {/* Parking Overview: zone availability, allocation mix, and recent
+          activity now share a single frame, laid out in three equal
+          columns on large screens and stacking on smaller ones. */}
+      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-3">
           <h2 className="text-lg font-bold text-slate-950">Parking Overview</h2>
-          <p className="text-sm text-slate-500">Zone availability and allocation mix.</p>
+          <p className="text-sm text-slate-500">Zone availability, allocation mix, and recent activity.</p>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="grid gap-3 lg:grid-cols-3">
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <h3 className="text-sm font-bold text-slate-950">Parking Zone Availability</h3>
-            <div className="mt-4 space-y-4">
+            <div className="mt-3 space-y-3">
               {zoneAvailability.map((zone) => (
                 <div key={zone.zone}>
                   <div className="flex items-center justify-between text-sm">
@@ -728,9 +730,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <h3 className="text-sm font-bold text-slate-950">Allocation Summary</h3>
-            <div className="mt-4 space-y-3">
+            <div className="mt-3 space-y-2.5">
               {allocationSummary.map((item) => (
                 <div key={item.status}>
                   <div className="flex items-center justify-between text-sm">
@@ -743,75 +745,27 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 rounded-lg bg-slate-950 p-3 text-white">
+            <div className="mt-3 rounded-lg bg-slate-950 p-2.5 text-white">
               <p className="text-xs font-semibold text-teal-200">System Health</p>
               <p className="mt-1 text-lg font-bold">98.7%</p>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Recent Vehicle Activity */}
-      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="text-base font-bold text-slate-950">Recent Vehicle Activity</h2>
-        <div className="mt-3 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
-          {recentActivity.map((activity) => (
-            <div key={`${activity.time}-${activity.vehicle}`} className="flex gap-2.5 rounded-lg border border-slate-100 bg-slate-50 p-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white text-teal-700 shadow-sm">
-                <activity.icon className="text-sm" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-xs font-bold text-slate-950">{activity.vehicle}</p>
-                  <p className="shrink-0 text-[11px] font-semibold text-slate-400">{activity.time}</p>
-                </div>
-                <p className="mt-0.5 text-xs text-slate-600">{activity.action} &middot; {activity.zone}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Traffic Heatmap */}
-      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-bold text-slate-950">Traffic Heatmap</h2>
-            <p className="text-sm text-slate-500">Demo occupancy intensity by day and time.</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-            <span className="h-2.5 w-2.5 rounded-sm bg-slate-200" />
-            Low
-            <span className="ml-2 h-2.5 w-2.5 rounded-sm bg-rose-600" />
-            High
-          </div>
-        </div>
-
-        <div className="scrollbar-thin mt-3 overflow-x-auto">
-          <div className="min-w-[1200px]">
-            <div className="grid grid-cols-[70px_repeat(24,minmax(42px,1fr))] gap-1">
-              <div />
-              {heatmapTimes.map((time) => (
-                <div key={time} className="text-center text-[10px] font-bold text-slate-400">
-                  {time}
-                </div>
-              ))}
-
-              {heatmapDays.map((day, dayIndex) => (
-                <div key={day} className="contents">
-                  <div className="flex items-center text-xs font-bold text-slate-600">
-                    {day}
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-950">Recent Vehicle Activity</h3>
+            <div className="mt-3 space-y-2">
+              {recentActivity.map((activity) => (
+                <div key={`${activity.time}-${activity.vehicle}`} className="flex gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white text-teal-700 shadow-sm">
+                    <activity.icon className="text-xs" />
                   </div>
-
-                  {heatmapData[dayIndex].map((value, valueIndex) => (
-                    <div
-                      key={`${day}-${heatmapTimes[valueIndex]}`}
-                      className={`flex h-7 items-center justify-center rounded text-[10px] font-bold ${getHeatmapTone(value, dayIndex === currentWeekdayIndex)}`}
-                      title={`${day} ${heatmapTimes[valueIndex]}: ${value}% occupied`}
-                    >
-                      {value}%
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-xs font-bold text-slate-950">{activity.vehicle}</p>
+                      <p className="shrink-0 text-[10px] font-semibold text-slate-400">{activity.time}</p>
                     </div>
-                  ))}
+                    <p className="mt-0.5 text-xs text-slate-600">{activity.action} &middot; {activity.zone}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -869,6 +823,53 @@ export default function Dashboard() {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Traffic Heatmap */}
+      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-2 border-b border-slate-200 pb-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-base font-bold text-slate-950">Traffic Heatmap</h2>
+            <p className="text-sm text-slate-500">Demo occupancy intensity by day and time.</p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+            <span className="h-2.5 w-2.5 rounded-sm bg-slate-200" />
+            Low
+            <span className="ml-2 h-2.5 w-2.5 rounded-sm bg-rose-600" />
+            High
+          </div>
+        </div>
+
+        <div className="scrollbar-thin mt-3 overflow-x-auto">
+          <div className="min-w-[1200px]">
+            <div className="grid grid-cols-[70px_repeat(24,minmax(42px,1fr))] gap-1">
+              <div />
+              {heatmapTimes.map((time) => (
+                <div key={time} className="text-center text-[10px] font-bold text-slate-400">
+                  {time}
+                </div>
+              ))}
+
+              {heatmapDays.map((day, dayIndex) => (
+                <div key={day} className="contents">
+                  <div className="flex items-center text-xs font-bold text-slate-600">
+                    {day}
+                  </div>
+
+                  {heatmapData[dayIndex].map((value, valueIndex) => (
+                    <div
+                      key={`${day}-${heatmapTimes[valueIndex]}`}
+                      className={`flex h-7 items-center justify-center rounded text-[10px] font-bold ${getHeatmapTone(value, dayIndex === currentWeekdayIndex)}`}
+                      title={`${day} ${heatmapTimes[valueIndex]}: ${value}% occupied`}
+                    >
+                      {value}%
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
